@@ -58,8 +58,7 @@ services:
   db:
     image: postgres
     ports:
-      - "5433:5433"
-    command: -p 5433
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:

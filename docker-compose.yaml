@@ -1,9 +1,9 @@
 version: "3.8"
 services:
-  zookeeper:
+  zookeeper_local_dev:
     image: confluentinc/cp-zookeeper
     hostname: zookeeper
-    container_name: zookeeper_auxinputters
+    container_name: zookeeper_local_dev
     ports:
       - "2181:2181"
     environment:
@@ -13,12 +13,12 @@ services:
       - /var/lib/zookeeper/data:uid=1000,gid=1000
       - /var/lib/zookeeper/log:uid=1000,gid=1000
 
-  broker:
+  broker_local_dev:
     image: confluentinc/cp-server
     hostname: broker
-    container_name: broker_auxinputters
+    container_name: broker_local_dev
     depends_on:
-      - zookeeper
+      - zookeeper_local_dev
     ports:
       - "9092:9092"
       - "9101:9101"
@@ -42,12 +42,12 @@ services:
       CONFLUENT_METRICS_ENABLE: 'true'
       CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
 
-  schema-registry:
+  schema-registry_local_dev:
     image: confluentinc/cp-schema-registry
     hostname: schema-registry
-    container_name: schema-registry_auxinputters
+    container_name: schema-registry_local_dev
     depends_on:
-      - broker
+      - broker_local_dev
     ports:
       - "8081:8081"
     environment:
@@ -55,8 +55,9 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:29092'
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
 
-  db:
+  db_local_dev:
     image: postgres
+    container_name: postgres_local_dev
     ports:
       - "5433:5432"
     volumes:
@@ -67,12 +68,10 @@ services:
       POSTGRES_DB: test_iss
 
   local-setup:
-    volumes:
-      - .:/app
     image: ./.
     depends_on:
-      - db
-      - schema-registry
+      - db_local_dev
+      - schema-registry_local_dev
 
 volumes:
   pgdata:
